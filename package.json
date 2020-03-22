@@ -1,7 +1,7 @@
 {
   "name": "rango-ui",
   "version": "0.1.0",
-  "private": true,
+  "private": false,
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
@@ -29,10 +29,13 @@
       "plugin:vue/essential",
       "eslint:recommended"
     ],
+    "rules": {
+      "no-debugger": "off",
+      "no-unused-vars": "off"
+    },
     "parserOptions": {
       "parser": "babel-eslint"
-    },
-    "rules": {}
+    }
   },
   "browserslist": [
     "> 1%",

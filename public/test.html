@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>test</title>
+    <style>
+        @keyframes mymove {
+            to {
+                left: 100%;
+            }
+        }
+
+        #mydiv {
+            width: 300px;
+            height: 200px;
+            background: red;
+            position: absolute;
+            left: 50%;
+        }
+
+        .rango {
+            animation: mymove 1s;
+            animation-fill-mode: forwards;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="mydiv" />
+</body>
+
+</html>
