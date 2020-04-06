@@ -87,22 +87,23 @@ export default {
       if (this.cardList.length === 1)
         this.cardList[0].setLeft(0);
       else
-        this.cardList[this.cardList.length - 1].setLeft(-100);
+        this.cardList[this.cardList.length - 1].setLeft(-this.width);
     },
     onTouchStart(e) {
       /* console.log("滑动开始");
       console.log(e.touches.length);
       console.log(e.touches[0].clientX); */
 
+      console.log(this.selectedIndex);
       this.lastPosition = e.touches[0].clientX;
       this.sumOffset = 0;
 
       if (this.cardList[this.selectedIndex + 1]) {
-        this.cardList[this.selectedIndex + 1].setLeft(100);
+        this.cardList[this.selectedIndex + 1].setLeft(this.width);
       }
 
       if (this.cardList[this.selectedIndex - 1]) {
-          this.cardList[this.selectedIndex - 1].setLeft(-100);
+          this.cardList[this.selectedIndex - 1].setLeft(-this.width);
       }
     },
     onTouchMove(e) {
@@ -112,31 +113,37 @@ export default {
       if (!e.touches)
         return;
 
-      let offset = 100 * (e.touches[0].clientX - this.lastPosition) / this.width;
+      let offset = e.touches[0].clientX - this.lastPosition;
       //console.log("offset:" + offset + " slideDistance:" + (e.touches[0].clientX - this.lastPosition));
 
       this.sumOffset += offset;
       this.cardList[this.selectedIndex].slide(offset);
 
-      if (this.sumOffset >= 0) {
+      if (this.cardList[this.selectedIndex - 1])
+        this.cardList[this.selectedIndex - 1].slide(offset);
+
+      if (this.cardList[this.selectedIndex + 1])
+        this.cardList[this.selectedIndex + 1].slide(offset);
+
+      /* if (this.sumOffset >= 0) {
         // 往右边划的
         if (this.cardList[this.selectedIndex + 1]) {
-          this.cardList[this.selectedIndex + 1].setLeft(100);
+          this.cardList[this.selectedIndex + 1].setLeft(this.width);
         }
 
         if (this.cardList[this.selectedIndex - 1]) {
-          this.cardList[this.selectedIndex - 1].slide(1 - offset);
+          this.cardList[this.selectedIndex - 1].slide(offset);
         }
       } else {
         // 往左边划
         if (this.cardList[this.selectedIndex + 1]) {
-          this.cardList[this.selectedIndex + 1].slide(offset - 1);
+          this.cardList[this.selectedIndex + 1].slide(offset);
         }
 
         if (this.cardList[this.selectedIndex - 1]) {
-          this.cardList[this.selectedIndex - 1].setLeft(-100);
+          this.cardList[this.selectedIndex - 1].setLeft(-this.width);
         }
-      }
+      } */
 
       this.lastPosition = e.touches[0].clientX;
     },
@@ -149,7 +156,7 @@ export default {
 
       //this.sumOffset += offset;
       console.log("onTouchEnd offset: " + this.sumOffset);
-      if (this.sumOffset < 100 * (-100 / this.width) && this.cardList[this.selectedIndex + 1]) {
+      if (this.sumOffset < -100 && this.cardList[this.selectedIndex + 1]) {
         // 往右边划到下一个
         //this.cardList[this.selectedIndex].slideToRight();
 
@@ -158,7 +165,7 @@ export default {
 
         ++this.selectedIndex;
       } else if (
-        this.sumOffset > 100 * (100 / this.width) &&
+        this.sumOffset > 100 &&
         this.cardList[this.selectedIndex - 1]
       ) {
         console.log("往左滑到下一个");
