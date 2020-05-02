@@ -8,16 +8,15 @@
     @touchend="onTouchEnd"
   >
     <slot></slot>
-    <point-list
+    <indicator-list v-if="isIndicator"
       :width="width"
-      :numOfCards="numOfCards"
-      ref="point-list"
-      :selectedIndex="selectedIndex"
-    />
+      :numOfIndicators="numOfCards"
+      ref="indicator-list"
+      :selectedIndex="selectedIndex"/>
   </div>
 </template>
 <script>
-import PointList from "./PointList";
+import IndicatorList from "../Indicator/IndicatorList";
 export default {
   data() {
     return {
@@ -28,7 +27,7 @@ export default {
       selectedIndex: 0, // 当前展示的卡片
       cardList: [],
       sumOffset: 0, // 总移动量 大于0代表往右边移动，小于0代表往左边移动
-      interval: null, // 轮播setInterval的返回结果，用于重置轮播
+      autoInterval: null, // 轮播setInterval的返回结果，用于重置轮播
       lastPosition: 0 // 上一个点的position，用两个点相减拿到本次的滑动
     };
   },
@@ -53,46 +52,64 @@ export default {
       type: Number,
       default: 0
     },
-    autoInterval: {
+    auto: {
       type: Number,
       default: 0 // 0代表不自动播放
     },
     isVertical: {
       type: Boolean,
       default: false // 默认横向滚动
+    },
+    isIndicator: {
+      type: Boolean,
+      default: false
+    },
+    onIndexChange: {
+      type: Function,
+      default: function(){}
     }
   },
   components: {
-    PointList
+    IndicatorList
   },
   provide() {
     return {
       cardMargin: this.cardMargin,
       cardWidth: this.cardWidth,
       cardHeight: this.cardHeight,
-      onCardMounted: this.onCardMounted,
+      onCardMounted: this.onCardMounted
     };
   },
-  mounted() {},
+  mounted() {
+    if (this.auto){
+      this.autoInterval = setInterval(this.autoPlay, this.auto);
+    }
+  },
   computed: {
     numOfCards() {
       return this.cardList.length > 0 ? this.cardList.length : -1;
     }
   },
   methods: {
+    autoPlay(){
+      if (this.cardList && this.cardList[this.selectedIndex + 1]){
+        this.cardList[this.selectedIndex].slideToSide(-1);
+        this.cardList[this.selectedIndex + 1].slideToCenter();
+        ++this.selectedIndex;
+
+        if (this.onIndexChange)
+          this.onIndexChange(this.selectedIndex);
+      }
+    },
     onCardMounted(card) {
       this.cardList.push(card);
       this.selectedIndex = 0;
 
-      if (this.cardList.length === 1)
-        this.cardList[0].setLeft(0);
-      else
-        this.cardList[this.cardList.length - 1].setLeft(-this.width);
+      if (this.cardList.length === 1) this.cardList[0].setLeft(0);
+      else this.cardList[this.cardList.length - 1].setLeft(-this.width);
     },
     onTouchStart(e) {
-      /* console.log("滑动开始");
-      console.log(e.touches.length);
-      console.log(e.touches[0].clientX); */
+      clearInterval(this.autoInterval);
 
       console.log(this.selectedIndex);
       this.lastPosition = e.touches[0].clientX;
@@ -103,18 +120,13 @@ export default {
       }
 
       if (this.cardList[this.selectedIndex - 1]) {
-          this.cardList[this.selectedIndex - 1].setLeft(-this.width);
+        this.cardList[this.selectedIndex - 1].setLeft(-this.width);
       }
     },
     onTouchMove(e) {
-      /* console.log("滑动中");
-      console.log(e.touches.length);
-      console.log(e.touches[0].clientX); */
-      if (!e.touches)
-        return;
+      if (!e.touches) return;
 
       let offset = e.touches[0].clientX - this.lastPosition;
-      //console.log("offset:" + offset + " slideDistance:" + (e.touches[0].clientX - this.lastPosition));
 
       this.sumOffset += offset;
       this.cardList[this.selectedIndex].slide(offset);
@@ -125,45 +137,22 @@ export default {
       if (this.cardList[this.selectedIndex + 1])
         this.cardList[this.selectedIndex + 1].slide(offset);
 
-      /* if (this.sumOffset >= 0) {
-        // 往右边划的
-        if (this.cardList[this.selectedIndex + 1]) {
-          this.cardList[this.selectedIndex + 1].setLeft(this.width);
-        }
-
-        if (this.cardList[this.selectedIndex - 1]) {
-          this.cardList[this.selectedIndex - 1].slide(offset);
-        }
-      } else {
-        // 往左边划
-        if (this.cardList[this.selectedIndex + 1]) {
-          this.cardList[this.selectedIndex + 1].slide(offset);
-        }
-
-        if (this.cardList[this.selectedIndex - 1]) {
-          this.cardList[this.selectedIndex - 1].setLeft(-this.width);
-        }
-      } */
-
       this.lastPosition = e.touches[0].clientX;
     },
     onTouchEnd(e) {
-      //console.log("滑动结束");
-      /* console.log(e.touches.length);
-      console.log(e.touches[0].clientX); */
-
-      //let offset = e.touches[0].clientX - this.lastPosition;
-
-      //this.sumOffset += offset;
       console.log("onTouchEnd offset: " + this.sumOffset);
+      let that = this;
       if (this.sumOffset < -100 && this.cardList[this.selectedIndex + 1]) {
         // 往右边划到下一个
         //this.cardList[this.selectedIndex].slideToRight();
 
-        this.cardList[this.selectedIndex].slideToSide(-1);
-        this.cardList[this.selectedIndex + 1].slideToCenter();
-
+        that.cardList[that.selectedIndex].slideToSide(-1);
+        that.cardList[that.selectedIndex + 1].slideToCenter();
         ++this.selectedIndex;
+
+        if (this.onIndexChange){
+          this.onIndexChange(this.selectedIndex);
+        }
       } else if (
         this.sumOffset > 100 &&
         this.cardList[this.selectedIndex - 1]
@@ -171,21 +160,24 @@ export default {
         console.log("往左滑到下一个");
         // 往左边滑到下一个
         //this.cardList[this.selectedIndex].slideToLeft();
-        this.cardList[this.selectedIndex].slideToSide(1);
-        this.cardList[this.selectedIndex - 1].slideToCenter();
-
+        that.cardList[that.selectedIndex].slideToSide(1);
+        that.cardList[that.selectedIndex - 1].slideToCenter();
         --this.selectedIndex;
+
+        if (this.onIndexChange){  
+          this.onIndexChange(this.selectedIndex);
+        }
       } else {
         console.log("惯性回位");
         // 惯性回位
         if (this.cardList[this.selectedIndex - 1]) {
           //this.cardList[this.selectedIndex - 1].slideToLeft();
-          this.cardList[this.selectedIndex - 1].slideToSide(-1);
+          that.cardList[that.selectedIndex - 1].slideToSide(-1);
         }
 
         if (this.cardList[this.selectedIndex + 1]) {
           //this.cardList[this.selectedIndex + 1].slideToRight();
-          this.cardList[this.selectedIndex + 1].slideToSide(1);
+          that.cardList[that.selectedIndex + 1].slideToSide(1);
         }
 
         this.cardList[this.selectedIndex].slideToCenter();
@@ -193,6 +185,10 @@ export default {
 
       this.sumOffset = 0;
       this.lastPosition = 0;
+
+      if (this.auto){
+        this.autoInterval = setInterval(this.autoPlay, this.auto);
+      }
     },
     slide(direction) {
       // 根据方向滑动selectedIndex和旁边的卡片

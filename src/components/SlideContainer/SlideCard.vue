@@ -11,13 +11,11 @@ export default {
       slideCardStyle: {
         height: this.cardHeight + "px",
         width: this.cardWidth + "px",
-        left: this.left + "px",
         position: "absolute",
-        /* animationFillMode: "forwards", */
         transform: "translateX(" + this.left + "px)",
-        transitionDuring: "0.6s",
+        transitionDuration: "0"
       },
-      left: -this.cardWidth,
+      left: -this.cardWidth
     };
   },
   inject: {
@@ -49,32 +47,27 @@ export default {
 
       this.slideCardStyle = {
         ...this.slideCardStyle,
-        //left: this.slideCardStyle.left.substr(0, this.slideCardStyle.left.length - 2) + offset + "px",
-        left: this.left + "px",
-        //animation: "none"
+        transform: "translateX(" + this.left + "px)",
+        transitionDuration: "0",
       };
-      this.slideClass = "noSlide";
-      //console.log("left: " + this.left);
     },
     setLeft(left) {
-      //console.log("card set left: " + left);
       this.left = left;
       this.slideCardStyle = {
         ...this.slideCardStyle,
-        left: this.left + "px",
-        //left: left,
-      }
+        transform: "translateX(" + this.left + "px)",
+        transitionDuration: "0",
+      };
     },
     slideToCenter() {
       // 把卡片滑动到中间
       console.log("slideToCenter");
+      this.left = 0;
       this.slideCardStyle = {
         ...this.slideCardStyle,
-        left: "0",
-        //animation: "slideToCenter 5s"
+        transform: "translateX(" + this.left + "px)",
+        transitionDuration: "0.5s",
       };
-      this.left = 0;
-      //this.slideClass = "slideToCenter";
     },
     slideToSide(direction) {
       // 把卡片滑动到两边
@@ -83,14 +76,16 @@ export default {
         this.left = this.cardWidth;
         this.slideCardStyle = {
           ...this.slideCardStyle,
-          left: this.cardWidth + "px",
+          transform: "translateX(" + this.left + "px)",
+          transitionDuration: "0.5s",
         };
       } else {
         console.log("slideToLeft");
         this.left = -this.cardWidth;
         this.slideCardStyle = {
           ...this.slideCardStyle,
-          left: -this.cardWidth + "px",
+          transform: "translateX(" + this.left + "px)",
+          transitionDuration: "0.5s",
         };
       }
     }
@@ -101,21 +96,21 @@ export default {
 .slideCard {
   position: absolute;
 }
-.slideToCenter{
+.slideToCenter {
   animation: slideToCenter 1s;
   -webkit-animation: slideToCenter 1s;
   /* transform: translateX(0);
   transition-duration: .6s; */
   animation-fill-mode: forwards;
 }
-.slideToLeft{
+.slideToLeft {
   animation: slideToLeft 1s;
   -webkit-animation: slideToLeft 1s;
   /* transform: translateX(-100%);
   transition-duration: .6s; */
   animation-fill-mode: forwards;
 }
-.slideToRight{
+.slideToRight {
   animation: slideToRight 1s;
   -webkit-animation: slideToRight 1s;
   /* transform: translateX(100%);
