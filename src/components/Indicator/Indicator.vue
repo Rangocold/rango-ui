@@ -2,12 +2,16 @@
   <div class="indicator" :style="indicatorStyle"></div>
 </template>
 <script>
+import indicatorEmpty from "../../assets/indicatorEmpty.png";
+import indicatorSelected from "../../assets/indicatorSelected.png";
 export default {
+  name: "indicator",
   data() {
     return {
       indicatorStyle: {
         left: this.left + "px",
-        backgroundColor: "white",
+        backgroundImage: "url(" + indicatorEmpty + ")",
+        backgroundSize: "100% 100%",
       }
     };
   },
@@ -27,13 +31,13 @@ export default {
       if (isSelected){
         this.indicatorStyle = {
           ...this.indicatorStyle,
-          backgroundColor: "black",
+          backgroundImage: "url(" + indicatorSelected + ")",
         }
       }
       else{
         this.indicatorStyle = {
           ...this.indicatorStyle,
-          backgroundColor: "white",
+          backgroundImage: "url(" + indicatorEmpty + ")",
         }
       }
     },

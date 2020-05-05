@@ -6,6 +6,7 @@
 <script>
 import Indicator from "./Indicator";
 export default {
+  name: "indicator-list",
   data() {
     return {
       indicatorsLeft: [],

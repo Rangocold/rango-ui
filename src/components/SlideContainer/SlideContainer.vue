@@ -18,6 +18,7 @@
 <script>
 import IndicatorList from "../Indicator/IndicatorList";
 export default {
+  name: "slide-container",
   data() {
     return {
       cardContainerStyle: {

@@ -5,6 +5,7 @@
 </template>
 <script>
 export default {
+  name: "slide-card",
   data() {
     return {
       slideClass: "",

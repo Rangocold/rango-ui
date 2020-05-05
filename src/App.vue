@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <slide-container :auto="1000" v-if="isFirstSwipe" :isIndicator="false" :onIndexChange="onIndexChange">
+    <slide-container :auto="1000" v-if="isFirstSwipe" :isIndicator="true" :onIndexChange="onIndexChange">
       <slide-card>
         <div style="width: 600px;height: 100%;background-color: red" />
       </slide-card>
@@ -35,9 +35,9 @@
 </template>
 
 <script>
-import SlideContainer from "./components/SlideContainer/SlideContainer";
+/* import SlideContainer from "./components/SlideContainer/SlideContainer";
 import SlideCard from "./components/SlideContainer/SlideCard";
-import IndicatorList from "./components/Indicator/IndicatorList";
+import IndicatorList from "./components/Indicator/IndicatorList"; */
 
 export default {
   name: "App",
@@ -56,9 +56,9 @@ export default {
     },
   },
   components: {
-    SlideContainer,
+    /* SlideContainer,
     SlideCard,
-    IndicatorList,
+    IndicatorList, */
   }
 };
 </script>
